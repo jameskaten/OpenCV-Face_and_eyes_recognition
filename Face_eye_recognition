@@ -1,0 +1,27 @@
+import cv2 as cv
+
+fc = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+eye = cv.CascadeClassifier('haarcascade_eye.xml')
+
+cap = cv.VideoCapture(0) # camera recording
+cap.set(3,640) # image quality
+cap.set(4,480)
+
+while True:
+    ret, img = cap.read()
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY) # gray scale
+    faces = fc.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5, minSize=(20,20)) #얼굴 크기
+    for (x,y,w,h) in faces: # square on face: finding a face
+        cv.rectangle(img, (x,y), (x+w, y+h), (100,150,100) ,2)
+        roi_gray = gray[y:y+h, x:x+w]
+
+    eyes = eye.detectMultiScale(gray) # finding eyes
+    for(eye_x, eye_y, eye_w, eye_h) in eyes: # show red rectangles on eyes
+        cv.rectangle(img, (eye_x,eye_y), (eye_x+eye_w, eye_y+eye_h), (0,0,255) ,2)
+    cv.imshow('video', img)
+    k= cv.waitKey(30)&0xff #esc: exit window
+    if k == 27:
+        break
+
+cap.release()
+cv.destroyAllwindows()
